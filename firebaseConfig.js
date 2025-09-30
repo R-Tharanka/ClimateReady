@@ -1,30 +1,26 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps } from "firebase/app";
 // https://firebase.google.com/docs/web/setup#available-libraries
-import { getAuth, initializeAuth, getReactNativePersistence } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { getFirestore, collection, addDoc, getDoc, setDoc, doc, updateDoc, query, where, getDocs } from "firebase/firestore";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Platform } from 'react-native';
+// import AsyncStorage from "@react-native-async-storage/async-storage";
+// import { Platform } from 'react-native';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyB40FDC0EdiQIi2yOAmNUeK5qxRf2NTcnI",
   authDomain: "climateready-40665.firebaseapp.com",
   projectId: "climateready-40665",
-  storageBucket: "climateready-40665.firebasestorage.app",
+  storageBucket: "climateready-40665.appspot.com",
   messagingSenderId: "438204560483",
   appId: "1:438204560483:web:76dd8e0a5f5551e85fb456"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase (prevent duplicate app error)
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
-// Initialize Auth with AsyncStorage persistence
-export const auth = Platform.OS === 'web' 
-  ? getAuth(app) 
-  : initializeAuth(app, {
-      persistence: getReactNativePersistence(AsyncStorage)
-    });
+// Initialize Auth (Expo Go compatible)
+export const auth = getAuth(app);
 
 // Export app for reference if needed
 export const firebaseApp = app;

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
@@ -11,10 +10,25 @@ import {
   ActivityIndicator,
   ScrollView
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { InputField, Button } from '../../../../components/AuthComponents';
 import { useAuth } from '../../../../context/AuthContext';
+
+// Add or extend the UserProfile type to include 'address'
+type Address = {
+  street?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  country?: string;
+};
+
+type UserProfile = {
+  // Add all other properties your userProfile object has here
+  address?: Address;
+};
 
 export default function EditAddressScreen() {
   const { userProfile, updateUserProfile } = useAuth();

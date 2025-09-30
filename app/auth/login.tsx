@@ -58,14 +58,19 @@ export default function LoginScreen() {
       await login(email, password);
       // Navigation will be handled by the auth state change in _layout.tsx
     } catch (error) {
-      console.log('Login error details:', JSON.stringify(error));
-      
+      // Log all error details for diagnosis
+      console.log('Login error object:', error);
+      // @ts-ignore
+      console.log('Login error code:', error.code);
+      // @ts-ignore
+      console.log('Login error message:', error.message);
+
       // Get the error code from Firebase error
       // @ts-ignore
       const errorCode = error.code || '';
       // @ts-ignore
       const errorMessage = error.message || 'Failed to log in';
-      
+
       // Handle specific Firebase auth error codes
       if (errorCode === 'auth/user-not-found' || 
           errorCode === 'auth/wrong-password' || 
