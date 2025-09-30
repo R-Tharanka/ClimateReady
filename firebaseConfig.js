@@ -1,9 +1,9 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps } from "firebase/app";
 // https://firebase.google.com/docs/web/setup#available-libraries
-import { getAuth } from "firebase/auth";
+import { getAuth, initializeAuth, getReactNativePersistence } from "firebase/auth";
 import { getFirestore, collection, addDoc, getDoc, setDoc, doc, updateDoc, query, where, getDocs } from "firebase/firestore";
-// import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from 'react-native';
 
 // Your web app's Firebase configuration
@@ -19,7 +19,8 @@ const firebaseConfig = {
 // Initialize Firebase (prevent duplicate app error)
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
-// Initialize Auth (Expo Go compatible)
+
+// Initialize Auth for all platforms (Expo Go compatible)
 export const auth = getAuth(app);
 
 // Export app for reference if needed

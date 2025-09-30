@@ -14,7 +14,7 @@ import Animated, {
   withSpring,
   withSequence,
   withDelay,
-  runOnJS,
+  withTiming,
   FadeIn,
   SlideInRight,
   SlideInLeft,
@@ -36,7 +36,7 @@ export default function LandingScreen() {
   const subtitleOpacity = useSharedValue(0);
   const button1Y = useSharedValue(100);
   const button2Y = useSharedValue(100);
-  const backgroundRotation = useSharedValue(0);
+  const pulseValue = useSharedValue(1);
 
   useEffect(() => {
     // Start animations when component mounts
@@ -45,10 +45,10 @@ export default function LandingScreen() {
     button1Y.value = withDelay(800, withSpring(0, { damping: 12 }));
     button2Y.value = withDelay(900, withSpring(0, { damping: 12 }));
     
-    // Continuous background rotation
-    backgroundRotation.value = withSequence(
-      withSpring(360, { damping: 20, stiffness: 50 }),
-      withSpring(0, { damping: 20, stiffness: 50 })
+    // Pulsing animation for emergency vibe
+    pulseValue.value = withSequence(
+      withTiming(1.1, { duration: 1000 }),
+      withTiming(1, { duration: 1000 })
     );
   }, []);
 
@@ -68,8 +68,8 @@ export default function LandingScreen() {
     transform: [{ translateY: button2Y.value }],
   }));
 
-  const backgroundAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${backgroundRotation.value}deg` }],
+  const pulseAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pulseValue.value }],
   }));
 
   const handleGetStarted = () => {
@@ -80,31 +80,38 @@ export default function LandingScreen() {
     router.push('/auth/login');
   };
 
+  const handleEmergency = () => {
+    // This could link to emergency protocols or quick start guide
+    router.push('/emergency' as any);
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       
-      {/* Animated Background */}
+      {/* Climate-themed Background */}
       <AnimatedLinearGradient
-        colors={['#667eea', '#764ba2', '#f093fb']}
-        style={[styles.background, backgroundAnimatedStyle]}
+        colors={['#1e3c72', '#2a5298', '#4a90e2']}
+        style={styles.background}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       />
       
-      {/* Floating Particles */}
+      {/* Weather/Climate Particles */}
       <View style={styles.particlesContainer}>
-        {[...Array(20)].map((_, index) => (
+        {[...Array(15)].map((_, index) => (
           <Animated.View
             key={index}
-            entering={FadeIn.delay(index * 100).springify()}
+            entering={FadeIn.delay(index * 150).springify()}
             style={[
               styles.particle,
               {
                 left: Math.random() * width,
                 top: Math.random() * height * 0.8,
-                width: Math.random() * 10 + 5,
-                height: Math.random() * 10 + 5,
+                width: Math.random() * 8 + 4,
+                height: Math.random() * 8 + 4,
+                backgroundColor: index % 3 === 0 ? '#4FC3F7' : 
+                               index % 3 === 1 ? '#81C784' : '#FFB74D',
                 opacity: Math.random() * 0.6 + 0.2,
               },
             ]}
@@ -113,13 +120,22 @@ export default function LandingScreen() {
       </View>
 
       <View style={styles.content}>
-        {/* Lottie Animation */}
+        {/* Emergency Alert Icon */}
+        <Animated.View 
+          style={[styles.emergencyContainer, pulseAnimatedStyle]}
+          entering={FadeIn.duration(1000)}
+        >
+          <Ionicons name="warning" size={40} color="#FF6B6B" />
+          <Text style={styles.emergencyText}>Be Prepared. Stay Safe.</Text>
+        </Animated.View>
+
+        {/* Lottie Animation - Climate/Weather themed */}
         <Animated.View 
           entering={SlideInRight.springify().damping(15)}
           style={styles.animationContainer}
         >
           <LottieView
-            source={require('../assets/animations/welcome.json')}
+            source={require('../assets/animations/weather.json')} // You can use weather, safety, or preparation animations
             autoPlay
             loop
             style={styles.lottie}
@@ -128,8 +144,8 @@ export default function LandingScreen() {
 
         {/* Title */}
         <Animated.View style={[styles.titleContainer, titleAnimatedStyle]}>
-          <Text style={styles.title}>Welcome to</Text>
-          <Text style={styles.titleAccent}>AppName</Text>
+          <Text style={styles.title}>ClimateGuard</Text>
+          <Text style={styles.subtitle}>Disaster Preparedness</Text>
         </Animated.View>
 
         {/* Subtitle */}
@@ -137,10 +153,20 @@ export default function LandingScreen() {
           style={[styles.subtitleContainer, subtitleAnimatedStyle]}
           entering={SlideInLeft.delay(400).springify()}
         >
-          <Text style={styles.subtitle}>
-            Transform your experience with our cutting-edge platform
+          <Text style={styles.description}>
+            Your trusted companion for climate disaster preparation and emergency response
           </Text>
         </Animated.View>
+
+        {/* Emergency Quick Action */}
+        <AnimatedTouchableOpacity
+          style={styles.emergencyButton}
+          onPress={handleEmergency}
+          entering={SlideInRight.delay(500).springify()}
+        >
+          <Ionicons name="alert-circle" size={24} color="#fff" />
+          <Text style={styles.emergencyButtonText}>Emergency Protocols</Text>
+        </AnimatedTouchableOpacity>
 
         {/* Buttons */}
         <View style={styles.buttonsContainer}>
@@ -150,13 +176,13 @@ export default function LandingScreen() {
             entering={SlideInRight.delay(600).springify()}
           >
             <LinearGradient
-              colors={['#667eea', '#764ba2']}
+              colors={['#4CAF50', '#2E7D32']}
               style={styles.buttonGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
             >
-              <Ionicons name="rocket" size={20} color="#fff" />
-              <Text style={styles.primaryButtonText}>Get Started</Text>
+              <Ionicons name="shield-checkmark" size={20} color="#fff" />
+              <Text style={styles.primaryButtonText}>Get Prepared</Text>
             </LinearGradient>
           </AnimatedTouchableOpacity>
 
@@ -165,30 +191,41 @@ export default function LandingScreen() {
             onPress={handleSignIn}
             entering={SlideInLeft.delay(700).springify()}
           >
-            <Ionicons name="log-in" size={20} color="#667eea" />
+            <Ionicons name="log-in" size={20} color="#2a5298" />
             <Text style={styles.secondaryButtonText}>Sign In</Text>
           </AnimatedTouchableOpacity>
         </View>
 
-        {/* Features List */}
+        {/* Features List - Climate Focused */}
         <Animated.View 
           style={styles.featuresContainer}
           entering={FadeIn.delay(1000).springify()}
         >
           {[
-            { icon: '⚡', text: 'Lightning Fast' },
-            { icon: '🔒', text: 'Secure & Private' },
-            { icon: '🎯', text: 'Intuitive Design' },
+            { icon: '🌀', text: 'Storm Alerts', color: '#4FC3F7' },
+            { icon: '🔥', text: 'Fire Safety', color: '#FF6B6B' },
+            { icon: '🚨', text: 'Quick Response', color: '#FFA726' },
           ].map((feature, index) => (
             <Animated.View
               key={index}
               style={styles.featureItem}
               entering={SlideInRight.delay(1200 + index * 200).springify()}
             >
-              <Text style={styles.featureIcon}>{feature.icon}</Text>
+              <Text style={[styles.featureIcon, { color: feature.color }]}>{feature.icon}</Text>
               <Text style={styles.featureText}>{feature.text}</Text>
             </Animated.View>
           ))}
+        </Animated.View>
+
+        {/* Safety Tip */}
+        <Animated.View 
+          style={styles.safetyTip}
+          entering={FadeIn.delay(1500).springify()}
+        >
+          <Ionicons name="information-circle" size={16} color="#4FC3F7" />
+          <Text style={styles.safetyTipText}>
+            Always have an emergency kit ready
+          </Text>
         </Animated.View>
       </View>
     </View>
@@ -202,11 +239,8 @@ const styles = StyleSheet.create({
   },
   background: {
     position: 'absolute',
-    width: height * 2,
-    height: height * 2,
-    top: -height * 0.5,
-    left: -width * 0.5,
-    opacity: 0.1,
+    width: '100%',
+    height: '100%',
   },
   particlesContainer: {
     position: 'absolute',
@@ -215,58 +249,95 @@ const styles = StyleSheet.create({
   },
   particle: {
     position: 'absolute',
-    backgroundColor: '#667eea',
     borderRadius: 50,
   },
   content: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: height * 0.1,
-    paddingBottom: 40,
+    paddingTop: height * 0.05,
+    paddingBottom: 30,
     justifyContent: 'space-between',
+  },
+  emergencyContainer: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  emergencyText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+    marginTop: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   animationContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   lottie: {
-    width: 200,
-    height: 200,
+    width: 180,
+    height: 180,
   },
   titleContainer: {
     alignItems: 'center',
     marginBottom: 16,
   },
   title: {
-    fontSize: 32,
-    fontWeight: '300',
-    color: '#333',
-    textAlign: 'center',
-  },
-  titleAccent: {
-    fontSize: 40,
+    fontSize: 36,
     fontWeight: '700',
-    color: '#667eea',
+    color: '#fff',
     textAlign: 'center',
-  },
-  subtitleContainer: {
-    marginBottom: 40,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 10,
   },
   subtitle: {
+    fontSize: 18,
+    fontWeight: '300',
+    color: 'rgba(255, 255, 255, 0.9)',
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  subtitleContainer: {
+    marginBottom: 30,
+  },
+  description: {
     fontSize: 16,
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.9)',
     textAlign: 'center',
     lineHeight: 24,
   },
+  emergencyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 107, 107, 0.9)',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    marginBottom: 20,
+    gap: 8,
+    shadowColor: '#FF6B6B',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  emergencyButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   buttonsContainer: {
     gap: 16,
-    marginBottom: 40,
+    marginBottom: 30,
   },
   primaryButton: {
     borderRadius: 25,
     overflow: 'hidden',
     elevation: 8,
-    shadowColor: '#667eea',
+    shadowColor: '#4CAF50',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -290,32 +361,48 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 16,
     paddingHorizontal: 32,
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: '#667eea',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 25,
     gap: 8,
   },
   secondaryButtonText: {
-    color: '#667eea',
+    color: '#2a5298',
     fontSize: 18,
     fontWeight: '600',
   },
   featuresContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingHorizontal: 20,
+    marginBottom: 20,
   },
   featureItem: {
     alignItems: 'center',
     gap: 8,
+    flex: 1,
   },
   featureIcon: {
-    fontSize: 24,
+    fontSize: 28,
   },
   featureText: {
     fontSize: 12,
-    color: '#666',
+    color: 'rgba(255, 255, 255, 0.9)',
     fontWeight: '500',
+    textAlign: 'center',
+  },
+  safetyTip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    padding: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: '#4FC3F7',
+  },
+  safetyTipText: {
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 12,
+    fontWeight: '400',
   },
 });
