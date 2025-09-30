@@ -143,7 +143,7 @@ export default function LoginScreen() {
             />
             
             <TouchableOpacity style={styles.forgotPassword}>
-              <Link href={'/forgot-password' as any} asChild>
+              <Link href={'/auth/forgot-password' as any} asChild>
                 <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
               </Link>
             </TouchableOpacity>

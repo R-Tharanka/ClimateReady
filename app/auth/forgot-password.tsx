@@ -87,12 +87,8 @@ export default function ForgotPasswordScreen() {
               <Text style={styles.subtitle}>
                 If an account exists for {email}, you'll receive a password reset link at this email address.
               </Text>
-              <Button
-                title="Back to Login"
-                onPress={() => {}} // Will use Link instead
-                style={styles.button}
-              />
-              <Link href={'/login' as any} asChild>
+              
+              <Link href={'/auth/login' as any} asChild>
                 <TouchableOpacity style={styles.linkButton}>
                   <Text style={styles.linkText}>Back to Login</Text>
                 </TouchableOpacity>
@@ -124,7 +120,7 @@ export default function ForgotPasswordScreen() {
                 style={styles.button}
               />
               
-              <Link href={'/login' as any} asChild>
+              <Link href={'/auth/login' as any} asChild>
                 <TouchableOpacity style={styles.backLink}>
                   <Ionicons name="arrow-back" size={16} color="#0284c7" />
                   <Text style={styles.backLinkText}>Back to Login</Text>
